@@ -8,14 +8,29 @@ use Illuminate\Http\Request;
 class NewsController extends Controller
 {
     // ini method controller untuk landing page news
-    public function index()
+   public function index()
     {
-        $semua_berita = News::with('wartawan', 'komentar')
-        ->latest()
-        ->get();
+        // 1. Berita Utama (Hero Section) - 1 Berita
+        // Kita ambil 1 berita terbaru sebagai hero.
+        $berita_utama = News::with('wartawan')->latest()->first();
 
+        // 2. Berita Pilihan (Grid di bawah Hero) - 4 Berita
+        // Kita ambil 4 berita selanjutnya (lewati 1 yang sudah jadi hero)
+        $berita_pilihan = News::with('wartawan')->latest()->skip(1)->take(4)->get();
+
+        // 3. Daftar Berita (Feed Utama) - 10 Berita
+        // Kita ambil 10 berita selanjutnya (lewati 5 yang sudah tampil)
+        $berita_terbaru_list = News::with('wartawan')->latest()->skip(5)->take(10)->get();
+
+        // 4. Title untuk tab browser
+        $title = 'Portal Berita Terkini';
+
+        // Kirim semua data ke view
         return view('news.index', [
-            'news_list' => $semua_berita
+            'berita_utama' => $berita_utama,
+            'berita_pilihan' => $berita_pilihan,
+            'berita_terbaru_list' => $berita_terbaru_list,
+            'title' => $title
         ]);
     }
 
